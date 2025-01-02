@@ -1,16 +1,9 @@
-'use client';
-
 import { useState } from 'react';
-import { DataGrid, GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { 
-    Button, 
-    Box, 
-    Alert, 
-    CircularProgress,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions 
+    Button, Box, Alert, CircularProgress, Dialog,
+    DialogTitle, DialogContent, DialogActions, Paper,
+    useTheme, useMediaQuery 
 } from '@mui/material';
 import { User } from '../types';
 
@@ -23,35 +16,49 @@ interface UserGridProps {
     error?: string | null;
 }
 
-export default function UserGrid({ 
-    users, 
-    onNew, 
-    onEdit, 
-    onDelete, 
-    isLoading = false,
-    error = null 
-}: UserGridProps) {
+export default function UserGrid({ users, onNew, onEdit, onDelete, isLoading, error }: UserGridProps) {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
-
-    const handleSelectionChange = (selectionModel: GridRowSelectionModel) => {
-        const selected = users.find(user => user.id === selectionModel[0]);
-        setSelectedUser(selected || null);
-    };
-
-    const handleDelete = () => {
-        if (selectedUser) {
-            onDelete(selectedUser);
-            setConfirmDelete(false);
-        }
-    };
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 90 },
-        { field: 'firstName', headerName: 'First Name', width: 130 },
-        { field: 'lastName', headerName: 'Last Name', width: 130 },
-        { field: 'email', headerName: 'Email', width: 200 },
-        { field: 'active', headerName: 'Active', width: 100, type: 'boolean' }
+        { 
+            field: 'firstName', 
+            headerName: 'First Name', 
+            width: 130,
+            flex: isMobile ? 1 : undefined 
+        },
+        { 
+            field: 'lastName', 
+            headerName: 'Last Name', 
+            width: 130,
+            flex: isMobile ? 1 : undefined 
+        },
+        { 
+            field: 'email', 
+            headerName: 'Email', 
+            width: 200,
+            flex: isMobile ? 1 : undefined 
+        },
+        { 
+            field: 'active', 
+            headerName: 'Status', 
+            width: 120,
+            renderCell: (params) => (
+                <Box sx={{ 
+                    bgcolor: params.value ? '#E8F5E9' : '#FFEBEE',
+                    color: params.value ? '#2E7D32' : '#C62828',
+                    px: 2,
+                    py: 0.5,
+                    borderRadius: 1,
+                    fontSize: '0.875rem'
+                }}>
+                    {params.value ? 'Active' : 'Inactive'}
+                </Box>
+            )
+        }
     ];
 
     if (isLoading) {
@@ -63,30 +70,36 @@ export default function UserGrid({
     }
 
     return (
-        <Box sx={{ width: '100%', height: 400 }}>
+        <Paper elevation={3} sx={{ p: { xs: 2, sm: 3 }, m: { xs: 1, sm: 2 } }}>
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
                 </Alert>
             )}
-            
-            <Box sx={{ mb: 2 }}>
+
+            <Box sx={{ 
+                mb: 2, 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 1 
+            }}>
                 <Button 
+                    fullWidth={isMobile}
                     variant="contained" 
-                    onClick={onNew} 
-                    sx={{ mr: 1 }}
+                    onClick={onNew}
                 >
                     New
                 </Button>
                 <Button 
+                    fullWidth={isMobile}
                     variant="contained" 
                     onClick={() => selectedUser && onEdit(selectedUser)}
                     disabled={!selectedUser}
-                    sx={{ mr: 1 }}
                 >
                     Edit
                 </Button>
                 <Button 
+                    fullWidth={isMobile}
                     variant="contained" 
                     color="error"
                     onClick={() => selectedUser && setConfirmDelete(true)}
@@ -99,13 +112,23 @@ export default function UserGrid({
             <DataGrid
                 rows={users}
                 columns={columns}
+                autoHeight
+                checkboxSelection
+                density={isMobile ? "compact" : "standard"}
+                onRowSelectionModelChange={(newSelection) => {
+                    const selected = users.find(user => user.id === newSelection[0]);
+                    setSelectedUser(selected || null);
+                }}
+                rowSelectionModel={selectedUser ? [selectedUser.id] : []}
                 initialState={{
                     pagination: { paginationModel: { pageSize: 5 } },
                 }}
                 pageSizeOptions={[5, 10, 25]}
-                checkboxSelection
-                onRowSelectionModelChange={handleSelectionChange}
-                rowSelectionModel={selectedUser ? [selectedUser.id] : []}
+                sx={{
+                    '& .MuiDataGrid-row:hover': {
+                        bgcolor: '#F5F5F5'
+                    }
+                }}
             />
 
             <Dialog
@@ -120,11 +143,17 @@ export default function UserGrid({
                     <Button onClick={() => setConfirmDelete(false)}>
                         Cancel
                     </Button>
-                    <Button color="error" onClick={handleDelete}>
+                    <Button 
+                        onClick={() => {
+                            selectedUser && onDelete(selectedUser);
+                            setConfirmDelete(false);
+                        }} 
+                        color="error"
+                    >
                         Delete
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Paper>
     );
 }

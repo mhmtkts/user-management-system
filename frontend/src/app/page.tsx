@@ -43,8 +43,7 @@ export default function Home() {
     };
 
     return (
-        <Container maxWidth="lg">
-            <Box sx={{ my: 4 }}>
+        <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
                 {mode !== 'view' ? (
                     <UserForm
                         mode={mode}
@@ -69,7 +68,6 @@ export default function Home() {
                         }}
                     />
                 )}
-            </Box>
         </Container>
     );
 }
