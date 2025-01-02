@@ -102,16 +102,21 @@ export default function UserForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    await onSubmit(formData);
-  };
 
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" p={4}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+    try {
+      await onSubmit(formData);
+    } catch (error) {
+      if (error instanceof Error) {
+        // Email hatası kontrolü
+        if (error.message.includes("Email already exists")) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            email: "Email already exists",
+          }));
+        }
+      }
+    }
+  };
 
   return (
     <Container maxWidth="md">
@@ -164,10 +169,10 @@ export default function UserForm({
                 value={formData.email}
                 onChange={(e) => {
                   setFormData({ ...formData, email: e.target.value });
-                  setValidationErrors({ ...validationErrors, email: "" });
+                  setValidationErrors((prev) => ({ ...prev, email: "" }));
                 }}
-                error={!!validationErrors.email}
-                helperText={validationErrors.email}
+                error={!!error || !!validationErrors.email}
+                helperText={error || validationErrors.email}
                 disabled={mode === "delete"}
                 required
               />

@@ -21,8 +21,17 @@ export const userApi = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(user),
         });
-        if (!response.ok) throw new Error('Failed to create user');
-        return response.json();
+    
+        const data = await response.json();
+    
+        if (!response.ok) {
+            if (response.status === 409) {
+                throw new Error('Email already exists');
+            }
+            throw new Error(data.error || 'Failed to create user');
+        }
+    
+        return data;
     },
 
     update: async (user: User): Promise<User> => {
