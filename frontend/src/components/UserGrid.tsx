@@ -39,7 +39,7 @@ export default function UserGrid({ users, onNew, onEdit, onDelete, isLoading, er
         { 
             field: 'email', 
             headerName: 'Email', 
-            width: 200,
+            width: 250,
             flex: isMobile ? 1 : undefined 
         },
         { 

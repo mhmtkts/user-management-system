@@ -11,6 +11,8 @@ export default function Home() {
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [mode, setMode] = useState<FormMode>('view');
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         loadUsers();
@@ -42,8 +44,23 @@ export default function Home() {
         }
     };
 
+    const handleDelete = async (user: User) => {
+        try {
+            await userApi.delete(user.id);
+            // Silinen kullanıcıyı state'den kaldır
+            setUsers(prevUsers => prevUsers.filter(u => u.id !== user.id));
+            setMode('view');
+            setError(null);
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message);
+            }
+        }
+    };
+
     return (
-        <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
+        <div className="min-h-screen bg-gray-50 py-8">
+            <div className="container mx-auto px-4">
                 {mode !== 'view' ? (
                     <UserForm
                         mode={mode}
@@ -51,8 +68,11 @@ export default function Home() {
                         onSubmit={handleSubmit}
                         onBack={() => {
                             setMode('view');
-                            setSelectedUser(null);
+                            setSelectedUser(null); // Back butonunda da sıfırla
+                            setError(null);
                         }}
+                        isLoading={isLoading}
+                        error={error}
                     />
                 ) : (
                     <UserGrid
@@ -62,12 +82,12 @@ export default function Home() {
                             setSelectedUser(user);
                             setMode('edit');
                         }}
-                        onDelete={(user) => {
-                            setSelectedUser(user);
-                            setMode('delete');
-                        }}
+                        onDelete={handleDelete}
+                        isLoading={isLoading}
+                        error={error}
                     />
                 )}
-        </Container>
+            </div>
+        </div>
     );
 }

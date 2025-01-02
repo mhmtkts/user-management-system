@@ -1,12 +1,15 @@
 package handlers
 
 import (
-    "net/http"
-    "user-management-system/backend/internal/models"
-    "user-management-system/backend/internal/services"
-    "github.com/gin-gonic/gin"
-    "strconv"
-    
+	"errors"
+	"log"
+	"net/http"
+	"strconv"
+	"user-management-system/backend/internal/models"
+	"user-management-system/backend/internal/services"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type UserHandler struct {
@@ -70,15 +73,24 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 func (h *UserHandler) CreateUser(c *gin.Context) {
     var user models.User
     if err := c.ShouldBindJSON(&user); err != nil {
-        c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-    
-    if err := h.userService.CreateUser(&user); err != nil {
+
+    // Debug için log ekle
+    log.Printf("Creating user: %+v", user)
+
+    err := h.userService.CreateUser(&user)
+    if err != nil {
+        log.Printf("Error creating user: %v", err)
+        if err.Error() == "email already exists" {
+            c.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
+            return
+        }
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
-    
+
     c.JSON(http.StatusCreated, user)
 }
 // UpdateUser godoc
@@ -116,16 +128,20 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 // @Success 204 "No Content"
 // @Router /api/users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
-    id := c.Param("id")
-    idUint, err := strconv.ParseUint(id, 10, 64)
+    id, err := strconv.Atoi(c.Param("id"))
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz kullanıcı ID"})
         return
     }
-    
-    if err := h.userService.DeleteUser(uint(idUint)); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+    if err := h.userService.DeleteUser(id); err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(http.StatusNotFound, gin.H{"error": "Kullanıcı bulunamadı"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Kullanıcı silinirken hata oluştu"})
         return
     }
-    c.Status(http.StatusNoContent)
+
+    c.JSON(http.StatusOK, gin.H{"message": "Kullanıcı başarıyla silindi"})
 }
