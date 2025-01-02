@@ -1,68 +1,88 @@
-# README.md
+# README for User Management System Frontend
 
-# User Management System
+## Project Overview
 
-Bu proje, kullanıcı yönetimi için bir sistem geliştirmek amacıyla oluşturulmuştur. Proje, Go ile yazılmış bir backend ve TypeScript ile yazılmış bir frontend içermektedir. Aşağıda, projenin bileşenleri ve kurulum talimatları yer almaktadır.
+This project is a User Management System built with React and Next.js for the frontend and Go with SQLite for the backend. It allows users to perform CRUD operations on user data.
 
-## Proje Yapısı
+## Features
 
-```
-user-management-system
-├── backend
-│   ├── cmd
-│   │   └── main.go
-│   ├── internal
-│   │   ├── api
-│   │   │   ├── handlers
-│   │   │   │   └── user_handler.go
-│   │   │   └── routes
-│   │   │       └── routes.go
-│   │   ├── database
-│   │   │   ├── db.go
-│   │   │   └── sqlite.db
-│   │   ├── models
-│   │   │   └── user.go
-│   │   └── services
-│   │       └── user_service.go
-│   ├── go.mod
-│   └── README.md
-├── frontend
-│   ├── src
-│   │   ├── app
-│   │   │   ├── layout.tsx
-│   │   │   └── page.tsx
-│   │   ├── components
-│   │   │   ├── UserGrid.tsx
-│   │   │   └── UserForm.tsx
-│   │   ├── services
-│   │   │   └── api.ts
-│   │   └── types
-│   │       └── index.ts
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── README.md
-└── README.md
-```
+- **User Listing**: A master view that lists all users in a data grid.
+- **CRUD Operations**: Users can create, edit, and delete user records.
+- **Responsive Design**: The application is designed to be responsive and user-friendly.
 
-## Kurulum
-
+## Technologies
 ### Backend
-
-1. `backend` dizinine gidin.
-2. Gerekli bağımlılıkları yüklemek için `go mod tidy` komutunu çalıştırın.
-3. Sunucuyu başlatmak için `go run cmd/main.go` komutunu kullanın.
+- Go
+- SQLite
+- GORM
+- Gin Web Framework
 
 ### Frontend
+- Next.js 13
+- TypeScript
+- Material-UI
+- Axios
 
-1. `frontend` dizinine gidin.
-2. Gerekli bağımlılıkları yüklemek için `npm install` komutunu çalıştırın.
-3. Uygulamayı başlatmak için `npm run dev` komutunu kullanın.
+## Prerequisites
+- Go 1.21 or higher
+- Node.js 18 or higher
+- npm 9 or higher
 
-## Kullanım
+## Installation
 
-- Ana görünümde tüm kullanıcıları listeleyebilir ve CRUD işlemlerini gerçekleştirebilirsiniz.
-- Detaylı görünümde kullanıcı bilgilerini görüntüleyebilir ve düzenleyebilirsiniz.
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd user-management-system
+```
 
-## Katkıda Bulunma
+2. Install backend dependencies:
+```bash
+cd backend
+go mod tidy
+```
 
-Herhangi bir katkıda bulunmak isterseniz, lütfen bir pull request oluşturun.
+3. Install frontend dependencies:
+```bash
+cd ../frontend
+npm install
+```
+## Running the Application
+
+1. Start the backend server (in a new terminal):
+
+```bash
+cd backend
+go run cmd/main.go
+```
+Backend will run on http://localhost:8080
+
+2. Start the frontend development server (in another terminal):
+
+```bash
+cd frontend
+npm run dev
+```
+
+Frontend will run on http://localhost:3000
+
+## API Endpoints
+
+- GET /api/users - List all users
+- GET /api/users/:id - Get user by ID
+- POST /api/users - Create new user
+- PUT /api/users/:id - Update user
+- DELETE /api/users/:id - Delete user
+
+## Features
+
+- Master view with data grid displaying all users
+- CRUD operations through user-friendly interface
+- Form validation
+- Responsive design
+- Real-time data updates
+
+## Important Notes
+
+- Both backend and frontend services must be running simultaneously
+- The backend service must be running for the frontend to function properly
