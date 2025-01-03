@@ -18,10 +18,10 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 func (s *UserService) CreateUser(user *models.User) error {
-    // Debug için log ekle
+    // Add log for debug
     log.Printf("Service: Creating user with email: %s", user.Email)
 
-    // Email kontrolü
+    // Email check
     var count int64
     s.db.Model(&models.User{}).Where("email = ?", user.Email).Count(&count)
     if count > 0 {
@@ -59,7 +59,7 @@ func (s *UserService) UpdateUser(user *models.User) error {
 }
 
 func (s *UserService) DeleteUser(id int) error {
-    // Hard delete kullan
+    // Use hard delete
     result := s.db.Unscoped().Delete(&models.User{}, id)
     if result.Error != nil {
         return result.Error

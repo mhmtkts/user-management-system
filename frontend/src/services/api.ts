@@ -3,6 +3,7 @@ import { User } from '../types';
 const API_URL = 'http://localhost:8080/api';
 
 export const userApi = {
+    // Get all users from the databas
     getAll: async (): Promise<User[]> => {
         const response = await fetch(`${API_URL}/users`);
         if (!response.ok) throw new Error('Failed to fetch users');
@@ -15,6 +16,7 @@ export const userApi = {
         return response.json();
     },
 
+    // Create a new user
     create: async (user: Omit<User, 'id'>): Promise<User> => {
         const response = await fetch(`${API_URL}/users`, {
             method: 'POST',
@@ -34,6 +36,7 @@ export const userApi = {
         return data;
     },
 
+    // Update existing user
     update: async (user: User): Promise<User> => {
         const response = await fetch(`${API_URL}/users/${user.id}`, {
             method: 'PUT',
@@ -44,6 +47,7 @@ export const userApi = {
         return response.json();
     },
 
+    // Delete user by ID
     delete: async (id: number): Promise<void> => {
         const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'DELETE',

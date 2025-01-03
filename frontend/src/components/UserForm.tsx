@@ -6,7 +6,6 @@ import {
   Switch,
   FormControlLabel,
   Alert,
-  CircularProgress,
   Paper,
   Grid,
   Container,
@@ -107,7 +106,7 @@ export default function UserForm({
       await onSubmit(formData);
     } catch (error) {
       if (error instanceof Error) {
-        // Email hatası kontrolü
+         // Email error check
         if (error.message.includes("Email already exists")) {
           setValidationErrors((prev) => ({
             ...prev,

@@ -77,7 +77,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
         return
     }
 
-    // Debug için log ekle
+    // Add log for debug
     log.Printf("Creating user: %+v", user)
 
     err := h.userService.CreateUser(&user)
